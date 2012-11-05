@@ -1,7 +1,7 @@
 {
-    "name": "chentepixtol/bender_zf",
+    "name": "juansimp/bender_zf",
     "type": "library",
-    "homepage": "https://github.com/chentepixtol/bender_zf",
+    "homepage": "https://github.com/juansimp/bender_zf",
     "version": "1.0.0-beta6",
     "license": "MIT",
     "require": {
