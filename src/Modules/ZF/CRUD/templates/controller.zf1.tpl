@@ -25,23 +25,8 @@ use Application\Controller\CrudController;
  *
  * @author chente
  */
-class {{ Controller }} extends CrudController
-{
-
-    /**
-     *
-     * @return array
-     */
+class {{ Controller }} extends CrudController {
     public function indexAction(){
-        return $this->_forward('list');
-    }
-
-    /**
-     *
-     * @return array
-     */
-    public function listAction()
-    {
         $this->view->page = $page = $this->getRequest()->getParam('page') ?: 1;
 
         if( $this->getRequest()->isPost() ){
@@ -62,122 +47,75 @@ class {{ Controller }} extends CrudController
 {% endfor %}
     }
 
-    /**
-     *
-     * @return array
-     */
-    public function newAction()
-    {
-        $url = $this->generateUrl('{{ slug }}', 'create');
-        $this->view->form = $this->getForm()->setAction($url);
+    public function newAction() {
+		${{ bean }} = new {{ Bean }}();
+		
+		$this->view->{{ bean }} = ${{ bean }};
+{% for foreignKey in fullForeignKeys %}
+{% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
+{% set queryForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()~'Query') %}
+        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find()->toCombo();
+{% endfor %}
+		$this->view->setTpl("Form");
     }
 
     /**
      *
      * @return array
      */
-    public function editAction()
-    {
+    public function editAction() {
         $id = $this->getRequest()->getParam('id');
-        ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("Not exists the {{ Bean }} with id {$id}"));
-
-        $url = $this->generateUrl('{{ slug }}', 'update', compact('id'));
-        $form = $this->getForm()
-            ->populate(${{ bean }}->toArray())
-            ->setAction($url);
-
-        $this->view->form = $form;
-        $this->view->setTpl("New");
-    }
-
-    /**
-     *
-     * @return array
-     */
-    public function createAction()
-    {
-        $form = $this->getForm();
-        if( $this->getRequest()->isPost() ){
-
-           $params = $this->getRequest()->getParams();
-           if( !$form->isValid($params) ){
-               $this->view->setTpl("New");
-               $this->view->form = $form;
-               return;
-           }
-
-           try
-           {
-               $this->get{{ Catalog }}()->beginTransaction();
-
-               ${{ bean }} = {{ Factory }}::createFromArray($form->getValues());
-               $this->get{{ Catalog }}()->create(${{ bean }});
-{% if table.getOptions().has('crud_logger') %}
-               $this->newLogForCreate(${{ bean }});
-{% endif %}
-
-               $this->get{{ Catalog }}()->commit();
-               $this->setFlash('ok', $this->i18n->_("Se ha guardado correctamente el {{ User }}"));
-           }
-           catch(Exception $e)
-           {
-               $this->get{{ Catalog }}()->rollBack();
-               $this->setFlash('error', $this->i18n->_($e->getMessage()));
-           }
-        }
-        $this->_redirect('{{ slug }}/list');
-    }
+        ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("The {{ Bean }} with id {$id} doesn't exist"));
+        
+		$this->view->{{ bean }} = ${{ bean }};
+{% for foreignKey in fullForeignKeys %}
+{% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
+{% set queryForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()~'Query') %}
+        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find()->toCombo();
+{% endfor %}
+		$this->view->setTpl("Form");
+	}
 
     /**
      *
      * @return array
      */
-    public function updateAction()
-    {
-        $form = $this->getForm();
-        if( $this->getRequest()->isPost() ){
-
-            $params = $this->getRequest()->getParams();
-            if( !$form->isValid($params) ){
-                $this->view->setTpl("New");
-                $this->view->form = $form;
-                return;
-            }
-
-            $id = $this->getRequest()->getParam('id');
-            ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("Not exists the {{ Bean }} with id {$id}"));
-
-            try
-            {
-                $this->get{{ Catalog }}()->beginTransaction();
-
-                {{ Factory }}::populate(${{ bean }}, $form->getValues());
-                $this->get{{ Catalog }}()->update(${{ bean }});
-{% if table.getOptions().has('crud_logger') %}
-                $this->newLogForUpdate(${{ bean }});
+    public function saveAction() {
+		if(0 == $id = (int) $this->getRequest()->getParam('id')) {
+			${{ bean }} = new {{ Bean }}();
+{% if fields.hasColumnName('/status/i') %}
+{% set statusField = fields.getByColumnName('/status/i') %}
+            ${{ bean }}->{{ statusField.setter }}({{ Bean }}::${{ statusField.getName().toUpperCamelCase }}['Active']);
 {% endif %}
-
-                $this->get{{ Catalog }}()->commit();
-                $this->setFlash('ok', $this->i18n->_("Se actualizo correctamente el {{ Bean}}"));
-            }
-            catch(Exception $e)
-            {
-                $this->get{{ Catalog }}()->rollBack();
-                $this->setFlash('error', $this->i18n->_($e->getMessage()));
-            }
+		} else {
+			${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("The {{ Bean }} with id {$id} doesn't exist"));
+		}
+		
+		try {
+			$this->get{{ Catalog }}()->beginTransaction();
+			
+			{{ Factory }}::populate(${{ bean }}, $this->getRequest()->getParams());
+            $this->get{{ Catalog }}()->save(${{ bean }});
+{% if table.getOptions().has('crud_logger') %}
+            $this->newLogForUpdate(${{ bean }});
+{% endif %}
+			$this->get{{ Catalog }}()->commit();
+            $this->setFlash('ok', $this->i18n->_("{{ Bean}} has been saved"));
+        } catch(Exception $e) {
+            $this->get{{ Catalog }}()->rollBack();
+            $this->setFlash('error', $this->i18n->_($e->getMessage()));
         }
-        $this->_redirect('{{ slug }}/list');
+        $this->getHelper('redirector')->goto('index');
     }
 
     /**
      *
      */
-    public function deleteAction(){
+    public function deleteAction() {
         $id = $this->getRequest()->getParam('id');
-        ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("Not exists the {{ Bean }} with id {$id}"));
+        ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("The {{ Bean }} with id {$id} doesn't exist"));
 
-        try
-        {
+        try {
             $this->get{{ Catalog }}()->beginTransaction();
 
 {% if fields.hasColumnName('/status/i') %}
@@ -190,25 +128,22 @@ class {{ Controller }} extends CrudController
 {% endif %}
 
             $this->get{{ Catalog }}()->commit();
-            $this->setFlash('ok', $this->i18n->_("Se desactivo correctamente el {{ Bean}}"));
-        }
-        catch(Exception $e)
-        {
+            $this->setFlash('ok', $this->i18n->_("{{ Bean }} has been disabled"));
+        } catch(Exception $e) {
             $this->get{{ Catalog }}()->rollBack();
             $this->setFlash('error', $this->i18n->_($e->getMessage()));
         }
-        $this->_redirect('{{ slug }}/list');
+        $this->getHelper('redirector')->goto('index');
     }
     
     /**
      *
      */
-    public function reactivateAction(){
+    public function reactivateAction() {
         $id = $this->getRequest()->getParam('id');
-        ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("Not exists the {{ Bean }} with id {$id}"));
+        ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("The {{ Bean }} with id {$id} doesn't exist"));
 
-        try
-        {
+        try {
             $this->get{{ Catalog }}()->beginTransaction();
 
 {% if fields.hasColumnName('/status/i') %}
@@ -222,13 +157,11 @@ class {{ Controller }} extends CrudController
 
             $this->get{{ Catalog }}()->commit();
             $this->setFlash('ok', $this->i18n->_("Se reactivo correctamente el {{ Bean}}"));
-        }
-        catch(Exception $e)
-        {
+        } catch(Exception $e) {
             $this->get{{ Catalog }}()->rollBack();
             $this->setFlash('error', $this->i18n->_($e->getMessage()));
         }
-        $this->_redirect('{{ slug }}/list');
+        $this->getHelper('redirector')->goto('index');
     }
 {% if table.getOptions().has('crud_logger') %}
 
@@ -295,20 +228,6 @@ class {{ Controller }} extends CrudController
      */
     protected function get{{ Catalog }}(){
         return $this->getContainer()->get('{{ Catalog }}');
-    }
-
-    /**
-     *
-     * @return {{ Form.getFullName() }}
-     */
-    protected function getForm()
-    {
-        $form = new {{ Form }}();
-        $submit = new Zend_Form_Element_Submit("send");
-        $submit->setLabel($this->i18n->_("Guardar"));
-        $form->addElement($submit)->setMethod('post');
-        $form->twitterDecorators();
-        return $form;
     }
 
 }
