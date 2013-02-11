@@ -1,5 +1,5 @@
 {% set logger = classes.get(table.getOptions().get('crud_logger')) %}
-    <table class="zebra-striped bordered-table">
+    <table class="table table-condensed table-hover">
         <caption><h3>{$i18n->_('Tracking')}</h3></caption>
         <thead>
             <tr>
@@ -21,4 +21,7 @@
             {/foreach}
         </tbody>
     </table>
+    <div class="form-actions">
+	    <a class="btn" href="javascript:history.go(-1)">{$i18n->_('Back')}</a>
+    </div>
     

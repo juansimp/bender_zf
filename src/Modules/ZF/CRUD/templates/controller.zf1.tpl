@@ -44,8 +44,20 @@ class {{ Controller }} extends CrudController {
         $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find()->toCombo();
 {% endfor %}
     }
+    
+    public function retriveAction() {
+        $id = $this->getRequest()->getParam('id');
+        ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("The {{ Bean }} with id {$id} doesn't exist"));
+        
+		$this->view->{{ bean }} = ${{ bean }};
+{% for foreignKey in fullForeignKeys %}
+{% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
+{% set queryForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()~'Query') %}
+        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find()->toCombo();
+{% endfor %}
+	}
 
-    public function newAction() {
+    public function createAction() {
 		${{ bean }} = new {{ Bean }}();
 		
 		$this->view->{{ bean }} = ${{ bean }};
@@ -61,7 +73,7 @@ class {{ Controller }} extends CrudController {
      *
      * @return array
      */
-    public function editAction() {
+    public function updateAction() {
         $id = $this->getRequest()->getParam('id');
         ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("The {{ Bean }} with id {$id} doesn't exist"));
         

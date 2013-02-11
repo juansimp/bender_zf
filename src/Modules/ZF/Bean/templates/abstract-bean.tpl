@@ -24,5 +24,11 @@ abstract class {{ AbstractBean }} implements {{ BaseBean }}
         }
         return $array;
     }
+    
+	{% if fields.containsIndex("name") %}
+    public function __toString() {
+		return $this->getName();
+	}
+	{% endif %}
 
 }
