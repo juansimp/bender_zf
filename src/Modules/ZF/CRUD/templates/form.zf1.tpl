@@ -1,10 +1,10 @@
 {% set slug = Controller.getName().toSlug('newString').replace('-controller','') %}
 {% set statusField = fields.getByColumnName('/status/i') %}
 
-<form class="form-horizontal" method="POST" action="{$baseUrl}/{{slug}}/save">
+<form class="form-horizontal" method="POST" action="{url action=save}">
 <input type="hidden" name="id" value="{${{ bean }}->{{ primaryKey.getter() }}()}"/>
 	<fieldset>
-		<legend>{$i18n->_('{{ Bean.getName().toUnderscore() }}')}</legend>
+		<legend>{$i18n->_('{{ Bean }}')}</legend>
 {% for field in fields.nonPrimaryKeys() %}
 {% if field.getName().toString() != parentPrimaryKey.getName().toString() and field != statusField %}
 		<div class="control-group">
@@ -21,7 +21,6 @@
 {% else %}
 	        <input type="text" value="{${{ bean }}->{{ field.getter() }}()}" placeholder="" id="{{ field.getName() }}" name="{{ field.getName().toUnderscore() }}" class="{% if field.isDate or field.isDatetime %}datepicker{% endif %} {% if field.isRequired %}required{% endif %}"/>
 {% endif %}
-			<span class="help-inline"></span>
 			</div>
 		</div>
 {% endif %}
@@ -29,6 +28,6 @@
 	</fieldset>
     <div class="form-actions">
 	    <button type="submit" class="btn btn-primary">{$i18n->_('Save')}</button>
-	    <a class="btn" href="{$baseUrl}/{{slug}}/index">{$i18n->_('Cancel')}</a>
+	    <a class="btn" href="javascript:history.go(-1)">{$i18n->_('Cancel')}</a>
     </div>
 </form>

@@ -6,7 +6,7 @@
 <div class="row-fluid">
 <div class="span12 well well-small filter" style="text-align: center;display:none;">
 <button class="close" onclick="$(this).parent().hide()">&times;</button>
-<form method="POST" action="" class="form-inline">
+<form method="GET" action="{url action=index}" class="form-inline">
     <input type="hidden" name="page" id="page" value="{$page|default:1}" />
     <div class="input-append">
 {% for foreignKey in fullForeignKeys %}

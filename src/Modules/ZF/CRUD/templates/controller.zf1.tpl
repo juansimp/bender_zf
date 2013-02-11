@@ -29,13 +29,11 @@ class {{ Controller }} extends CrudController {
     public function indexAction(){
         $this->view->page = $page = $this->getRequest()->getParam('page') ?: 1;
 
-        if( $this->getRequest()->isPost() ){
-            $this->view->post = $post = $this->getRequest()->getParams();
-        }
-
-        $total = {{ Query }}::create()->filter($post)->count();
+        $this->view->params = $params = $this->getRequest()->getParams();
+        
+        $total = {{ Query }}::create()->filter($params)->count();
         $this->view->{{ Bean.getName().pluralize() }} = ${{ Bean.getName().pluralize() }} = {{ Query }}::create()
-            ->filter($post)
+            ->filter($params)
             ->page($page, $this->getMaxPerPage())
             ->find();
 
