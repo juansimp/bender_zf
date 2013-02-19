@@ -14,7 +14,7 @@
 {% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
 {% set field = foreignKey.getLocal %}
 <!-- {$i18n->_('{{ field }}')} -->
-{html_options name={{ field }} id={{ field }} options=${{ classForeign.getName().pluralize() }} selected=$params['{{ field }}'] class="span2"}
+{html_options name={{ field }} id={{ field }} options=${{ classForeign.getName().pluralize() }}->toCombo() selected=$params['{{ field }}'] class="span2"}
 {% endfor %}
 {% for field in fullFields.nonForeignKeys() %}
 {% if field != statusField %}
@@ -62,7 +62,7 @@
 {% if field != statusField %}
 {% if inForeignKeys.containsIndex(field.getName().toString()) %}
 {% set foreignClass = classes.get(fullForeignKeys.getByColumnName(field.getName().toString()).getForeignTable().getObject()) %}
-                    <td>{${{ foreignClass.getName().pluralize() }}[${{ bean}}->{{ field.getter() }}()]}</td>
+                    <td>{if ${{ bean}}->{{ field.getter() }}())}{${{ foreignClass.getName().pluralize() }}->getByPK(${{ bean}}->{{ field.getter() }}())}{/if}</td>
 {% elseif field == statusField %}
                     <td>{$i18n->_(${{ bean }}->{{ statusField.getter() }}Name())}</td>
 {% else %}
