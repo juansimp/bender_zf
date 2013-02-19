@@ -9,7 +9,6 @@
 <div class="row-fluid">
 <div class="span11">
 <form method="GET" action="{url action=index}" class="form-inline">
-    <input type="hidden" name="page" id="page" value="{$page|default:1}" />
     <div class="input-append">
 {% for foreignKey in fullForeignKeys %}
 {% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
