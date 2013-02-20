@@ -41,7 +41,7 @@ class {{ Controller }} extends CrudController {
 {% for foreignKey in fullForeignKeys %}
 {% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
 {% set queryForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()~'Query') %}
-        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find()->toCombo();
+        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find();
 {% endfor %}
     }
     
@@ -53,7 +53,7 @@ class {{ Controller }} extends CrudController {
 {% for foreignKey in fullForeignKeys %}
 {% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
 {% set queryForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()~'Query') %}
-        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find()->toCombo();
+        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find();
 {% endfor %}
 	}
 
@@ -64,7 +64,7 @@ class {{ Controller }} extends CrudController {
 {% for foreignKey in fullForeignKeys %}
 {% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
 {% set queryForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()~'Query') %}
-        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find()->toCombo();
+        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find();
 {% endfor %}
 		$this->view->setTpl("Form");
     }
@@ -81,7 +81,7 @@ class {{ Controller }} extends CrudController {
 {% for foreignKey in fullForeignKeys %}
 {% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
 {% set queryForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()~'Query') %}
-        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find()->toCombo();
+        $this->view->{{ classForeign.getName().pluralize() }} = \{{ queryForeign.getFullName() }}::create()->find();
 {% endfor %}
 		$this->view->setTpl("Form");
 	}
@@ -101,10 +101,9 @@ class {{ Controller }} extends CrudController {
 			${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("The {{ Bean }} with id {$id} doesn't exist"));
 		}
 		
+		$this->get{{ Catalog }}()->beginTransaction();
 		try {
-			$this->get{{ Catalog }}()->beginTransaction();
-			
-			{{ Factory }}::populate(${{ bean }}, $this->getRequest()->getParams());
+			{{ Factory }}::populate(${{ bean }}, $this->getRequest()->getParams());			
             $this->get{{ Catalog }}()->save(${{ bean }});
 {% if table.getOptions().has('crud_logger') %}
             $this->newLogForUpdate(${{ bean }});
@@ -182,7 +181,7 @@ class {{ Controller }} extends CrudController {
         $id = $this->getRequest()->getParam('id');
         ${{ bean }} = {{ Query }}::create()->findByPKOrThrow($id, $this->i18n->_("Not exists the {{ Bean }} with id {$id}"));
         $this->view->{{ logger.getName().pluralize() }} = {{ loggerQuery }}::create()->whereAdd('{{ primaryKey }}', $id)->find();
-        $this->view->users = UserQuery::create()->find()->toCombo();
+        $this->view->users = UserQuery::create()->find();
     }
 
     /**

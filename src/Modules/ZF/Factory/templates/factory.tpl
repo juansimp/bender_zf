@@ -39,7 +39,15 @@ class {{ Factory }}{% if parent %} extends {{ classes.get(parent.getObject()~'Fa
 {% for field in fields %}
 
         if( isset($fields['{{ field }}']) ){
+{% if "id" in field.getName().toString() and not field.getNotnull() %}
+            if($fields['{{ field }}'] == 0){
+				${{ bean }}->{{ field.setter }}(new Zend_Db_Expr("NULL"));
+            } else {
+				${{ bean }}->{{ field.setter }}($fields['{{ field }}']);
+			}
+{% else %}
             ${{ bean }}->{{ field.setter }}($fields['{{ field }}']);
+{% endif %}
         }
 {% endfor %}
     }

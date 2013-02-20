@@ -62,7 +62,7 @@
 {% if field != statusField %}
 {% if inForeignKeys.containsIndex(field.getName().toString()) %}
 {% set foreignClass = classes.get(fullForeignKeys.getByColumnName(field.getName().toString()).getForeignTable().getObject()) %}
-                    <td>{if ${{ bean}}->{{ field.getter() }}())}{${{ foreignClass.getName().pluralize() }}->getByPK(${{ bean}}->{{ field.getter() }}())}{/if}</td>
+                    <td>{if ${{ bean}}->{{ field.getter() }}()}{${{ foreignClass.getName().pluralize() }}->getByPK(${{ bean}}->{{ field.getter() }}())->getName()}{/if}</td>
 {% elseif field == statusField %}
                     <td>{$i18n->_(${{ bean }}->{{ statusField.getter() }}Name())}</td>
 {% else %}

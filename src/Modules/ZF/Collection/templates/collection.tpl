@@ -38,8 +38,8 @@ class {{ Collection }} extends {% if parent %}{{ classes.get(parent.getObject()~
      * @return array
      */
 {% set fieldName = fields.getByColumnName('/name/i') %}
-    public function toCombo(){
-        return $this->map(function({{ Bean }} ${{ bean }}){
+    public function toCombo($notNull = false){
+        return ($notNull ? array() : array('')) + $this->map(function({{ Bean }} ${{ bean }}){
             return array( ${{ bean }}->{{ primaryKey.getter }}() => ${{ bean }}->{{ fieldName.getter }}() );
         });
     }

@@ -15,7 +15,7 @@
 {% if fields.inForeignKeys.containsIndex(field.getName().toString()) %}
 {% set foreignKey = foreignKeys.getByColumnName(field.getName().toString()) %}
 {% set classForeign = classes.get(foreignKey.getForeignTable().getObject().toUpperCamelCase()) %}
-	        {html_options options=${{ classForeign.getName().pluralize() }} name="{{ field.getName().toUnderscore() }}" id="{{ field.getName().toUpperCamelCase() }}" class="input-block-level {% if field.isDate or field.isDatetime %}datepicker{% endif %} {% if field.isRequired %}required{% endif %}"}	        
+	        {html_options options=${{ classForeign.getName().pluralize() }}->toCombo({% if field.getNotnull() %}1{% else %}0{% endif %}) name="{{ field.getName().toUnderscore() }}" id="{{ field.getName().toUpperCamelCase() }}" class="input-block-level {% if field.isDate or field.isDatetime %}datepicker{% endif %} {% if field.isRequired %}required{% endif %}"}	        
 {% elseif field.isBoolean %}
 			<label class="checkbox"><input type="checkbox" id="{{ field.getName() }}" name="{{ field.getName().toUnderscore() }}"/></label>
 {% else %}
