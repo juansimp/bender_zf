@@ -5,6 +5,8 @@
 {% if classes.get('Factory').getNamespace() != Factory.getNamespace() %}{{ classes.get('Factory').printUse() }}{% endif %}
 
 {% include "header_class.tpl" with {'infoClass': Factory} %}
+use Zend_Db;
+
 class {{ Factory }}{% if parent %} extends {{ classes.get(parent.getObject()~'Factory') }}{% endif %} implements {{ classes.get('Factory') }}
 {
 
